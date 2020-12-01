@@ -1,7 +1,7 @@
 XXFLAGS = -std=c++17 -Wall -Wextra -pedantic
 
-DEBUG_CFLAGS = -g3
-OPT_CFLAGS = -Ofast -ffunction-sections -fdata-sections -Wl,--gc-sections -s
+DEBUG_CXXFLAGS = -g3
+OPT_CXXFLAGS = -Ofast -ffunction-sections -fdata-sections -Wl,--gc-sections -s
 
 .PHONY: default all opt debug clean
 .PRECIOUS: obj/%.o obj/opt/%.o obj/debug/%.o
