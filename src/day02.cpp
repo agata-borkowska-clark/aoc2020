@@ -22,7 +22,7 @@ int main() {
   while (std::getline(std::cin, line)) {
     pwds.push_back(line);
   }
-  for (auto pwd : pwds) {
+  for (auto& pwd : pwds) {
     std::string::size_type size;
     int min = std::stoi(pwd, &size);
     pwd = pwd.substr(size + 1);
