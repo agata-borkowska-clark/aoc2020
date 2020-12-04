@@ -10,33 +10,21 @@ bool validate(int field, std::string* value) {
     case 0:
       try {
         int year = std::stoi(*value);
-        if (year >= 1920 && year <= 2002) {
-          return true;
-        } else {
-          return false;
-        }
+        return (year >= 1920 && year <= 2002);
       } catch (const std::exception& e) {
         return false;
       }
     case 1:
       try {
         int year = std::stoi(*value);
-        if (year >= 2010 && year <= 2020) {
-          return true;
-        } else {
-          return false;
-        }
+        return (year >= 2010 && year <= 2020);
       } catch (const std::exception& e) {
         return false;
       }
     case 2:
       try {
         int year = std::stoi(*value);
-        if (year >= 2020 && year <= 2030) {
-          return true;
-        } else {
-          return false;
-        }
+        return (year >= 2020 && year <= 2030);
       } catch (const std::exception& e) {
         return false;
       }
@@ -45,17 +33,9 @@ bool validate(int field, std::string* value) {
         int hgt = std::stoi(*value);
         std::string unit = value->substr(value->length() - 2);
         if (unit.compare("cm") == 0) {
-         if (hgt >= 150 && hgt <= 193)  {
-            return true;
-          } else {
-            return false;
-          }
+          return (hgt >= 150 && hgt <= 193);
         } else if (unit.compare("in") == 0) {
-          if (hgt >= 59 && hgt <= 76) {
-            return true;
-          } else {
-            return false;
-          }
+          return (hgt >= 59 && hgt <= 76);
         }
         return false;
       } catch (const std::exception& e) {
