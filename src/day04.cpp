@@ -25,7 +25,10 @@ bool validate(int field, std::string& value) {
       return compare_int_bounds(value, 2010, 2020);
     case 2:
       return compare_int_bounds(value, 2020, 2030);
-    case 3: 
+    case 3:
+      if (value.length() < 3) {
+        return false;
+      } 
       {
         std::string unit = value.substr(value.length() - 2);
         if (unit == "cm") {
@@ -71,10 +74,6 @@ bool check_all_there(std::array<bool,8>* seen) {
   return all_there;
 }
 
-void reset(std::array<bool, 8>& arr) {
-  arr = {};
-}
-
 int main() {
   std::string keys[] = {"byr:", "iyr:", "eyr:", "hgt:", "hcl:", "ecl:", "pid:", "cid:"};
   std::array<bool, 8> seen = {};
@@ -88,11 +87,11 @@ int main() {
       if (check_all_there(&seen)) {
         ++passport_count;
       }
-      reset(seen);
+      seen = {};
       if (check_all_there(&valid)) {
         ++valid_count;
       } 
-      reset(valid);
+      valid = {};
     } else {
       for (int i = 0; i < field_count - 1; ++i) {
         if (!seen[i]) {  // don't look for fields we've already found
