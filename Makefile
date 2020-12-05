@@ -1,4 +1,4 @@
-XXFLAGS = -std=c++17 -Wall -Wextra -pedantic
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic
 
 DEBUG_CXXFLAGS = -g3
 OPT_CXXFLAGS = -Ofast -ffunction-sections -fdata-sections -Wl,--gc-sections -s
