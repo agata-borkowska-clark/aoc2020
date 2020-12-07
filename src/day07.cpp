@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+std::map<std::string, int> child_sums = {};
+
 struct node {
   std::string colour;
   std::map<std::string, int> children = {};
@@ -76,7 +78,14 @@ int sum_children(std::map<std::string, node>& graph, std::string start, int sum)
   node& n = graph.at(start);
   for (auto const& child : n.children) {
     int new_sum = child.second;
-    new_sum += child.second * sum_children(graph, child.first, 0);
+    int child_sum;
+    try {
+      child_sum = child_sums.at(child.first);
+    } catch (const std::exception&) {
+      child_sum = sum_children(graph, child.first, 0);
+      child_sums.insert(std::pair<std::string, int>(child.first, child_sum));
+    }
+    new_sum += child.second * child_sum;
     sum += new_sum;
   }
   return sum;
