@@ -33,21 +33,16 @@ bool test_already_done(std::vector<size_t>* pointer_backtrace, std::vector<bool>
 
 void undo(std::vector<size_t>* pointer_backtrace, std::vector<std::string>& instructions,
         std::vector<bool>* already_done, size_t* pointer, int* accumulator, size_t stop) {
-  bool nothing_changed = true;
   std::string instruction;
   while (*pointer != stop) {
     *pointer = pointer_backtrace->back();
     pointer_backtrace->pop_back();
     already_done->at(*pointer) = false;
     instruction = instructions[*pointer].substr(0, 3);
-    //std::cout << "undoing " << instructions[*pointer] << " at pointer " << *pointer <<'\n';
     if (instruction == "acc") {
       *accumulator -= std::stoi(instructions[*pointer].substr(3));
-      //std::cout << "current accumulator value " << *accumulator << '\n';
     } 
   }
-  
-  std::cout << "done undoing with pointer at " << *pointer << '\n';
 }
 
 void retry(std::vector<size_t>* pointer_backtrace, std::vector<std::string>& instructions,
@@ -55,13 +50,10 @@ void retry(std::vector<size_t>* pointer_backtrace, std::vector<std::string>& ins
   while (*pointer < instructions.size() && !already_done->at(*pointer)) {
     pointer_backtrace->push_back(*pointer);
     std::string instruction = instructions[*pointer];
-    //std::cout << "retrying " << instruction << " at pointer " << *pointer << '\n';
     already_done->at(*pointer) = true;
     if (instruction.substr(0, 3) == "acc") {
       try {
-        // accumulator_backtrace->push_back(*accumulator);
         *accumulator += std::stoi(instruction.substr(3));
-        //std::cout << "current accumulator value " << *accumulator << '\n';
         ++*pointer;
       } catch (const std::exception&) {
         std::cout << "failed to parse int in instruction " << instruction << '\n';
@@ -76,8 +68,6 @@ void retry(std::vector<size_t>* pointer_backtrace, std::vector<std::string>& ins
       ++*pointer;
     }
   }
-//  std::cout << test_already_done(pointer_backtrace, already_done) << '\n';
-  std::cout << "done retrying with pointer " << *pointer << "\n";
 }
 
 
@@ -97,37 +87,30 @@ int main() {
   std::cout << accumulator << '\n';
 
   // Part 2
-  std::cout << "starting part2 with pointer at " << pointer << " already_done marked as " << already_done[pointer] << '\n';
-  //pointer = pointer_backtrace.back();
-  //pointer_backtrace.pop_back();
   size_t stop = 0;
-  for (size_t i = pointer_backtrace.size() - 1; i > 0; --i) {
+  for (size_t i = pointer_backtrace.size() - 2; i >= 0; --i) {
     if (instructions[pointer_backtrace[i]].substr(0, 3) != "acc") {
       stop = pointer_backtrace[i];
       break;
     }
   }
   while (pointer < instructions.size()) {
-    std::cout << "will stop at " << stop << '\n';
     undo(&pointer_backtrace, instructions, &already_done, &pointer, &accumulator, stop); 
     std::string instruction = instructions[pointer];
     pointer_backtrace.push_back(pointer);
     already_done[pointer] = true;
-    for (size_t i = pointer_backtrace.size() - 2; i > 0; --i) {
+    for (size_t i = pointer_backtrace.size() - 2; i >= 0; --i) {
       if (instructions[pointer_backtrace[i]].substr(0, 3) != "acc") {
+        if (pointer_backtrace[i] == stop) std::abort();
         stop = pointer_backtrace[i];
         break;
       }
     }
-    std::cout << "swapping at " << pointer << '\n';
     if (instruction.substr(0, 3) == "nop") {
       pointer += std::stoi(instruction.substr(3));
-      std::cout << "INSTRUCTION SWAP - jumping " << std::stoi(instruction.substr(3)) << '\n';
     } else if (instruction.substr(0, 3) == "jmp") {
-      std::cout << "INSTRUCTION SWAP - nop " << std::stoi(instruction.substr(3)) << "\n";
       ++pointer;
     } else {
-      std::cout << "trying to change instruction " << instruction << " - this shouldn't happen\n";
       break;
     }
     retry(&pointer_backtrace, instructions, &already_done, &pointer, &accumulator);
