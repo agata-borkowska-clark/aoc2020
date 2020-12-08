@@ -46,6 +46,7 @@ void undo(std::vector<size_t>* pointer_backtrace, std::vector<std::string>& inst
       //std::cout << "current accumulator value " << *accumulator << '\n';
     } 
   }
+  
   std::cout << "done undoing with pointer at " << *pointer << '\n';
 }
 
@@ -112,8 +113,13 @@ int main() {
     std::string instruction = instructions[pointer];
     pointer_backtrace.push_back(pointer);
     already_done[pointer] = true;
-    stop = pointer_backtrace.back();
-    std::cout << "swapping at " << stop << '\n';
+    for (size_t i = pointer_backtrace.size() - 2; i > 0; --i) {
+      if (instructions[pointer_backtrace[i]].substr(0, 3) != "acc") {
+        stop = pointer_backtrace[i];
+        break;
+      }
+    }
+    std::cout << "swapping at " << pointer << '\n';
     if (instruction.substr(0, 3) == "nop") {
       pointer += std::stoi(instruction.substr(3));
       std::cout << "INSTRUCTION SWAP - jumping " << std::stoi(instruction.substr(3)) << '\n';
