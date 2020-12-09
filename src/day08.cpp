@@ -88,7 +88,7 @@ int main() {
 
   // Part 2
   size_t stop = 0;
-  for (size_t i = pointer_backtrace.size() - 2; i >= 0; --i) {
+  for (size_t i = pointer_backtrace.size() - 1; i >= 0; --i) {
     if (instructions[pointer_backtrace[i]].substr(0, 3) != "acc") {
       stop = pointer_backtrace[i];
       break;
