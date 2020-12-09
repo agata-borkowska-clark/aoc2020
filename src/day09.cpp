@@ -17,13 +17,13 @@ void populate_preamble_sets(std::vector<long>& input, std::map<size_t, std::set<
         sum.insert(input[i] + input[j]);
       }
     }
-    sum_sets->insert(std::pair<long, std::set<long>>(i, std::move(sum)));
+    sum_sets->emplace(std::pair<long, std::set<long>>(i, std::move(sum)));
   }
 }
 
 bool find_in_preamble(size_t i, std::map<size_t, std::set<long>>* sum_sets, std::vector<long>& input) {
   for (size_t j = i - preamble_size; j < i; ++j) {
-    if (std::find(sum_sets->at(j).begin(), sum_sets->at(j).end(), input[i]) != sum_sets->at(j).end()) {
+    if (sum_sets->at(j).find(input[i]) != sum_sets->at(j).end()) {
       return true;
     }
   }
@@ -43,7 +43,7 @@ void move_preamble_window(size_t i, std::map<size_t, std::set<long>>* sum_sets, 
   for (size_t j = i - preamble_size + 1; j < i; ++j) {
     sum.insert(to_add + input[j]);
   }
-  sum_sets->insert(std::pair<long, std::set<long>>(i, std::move(sum)));
+  sum_sets->emplace(std::pair<long, std::set<long>>(i, std::move(sum)));
 }
 
 long find_weakness(size_t start, size_t end, std::vector<long>& input) {
