@@ -2,7 +2,6 @@
 #include <iostream>
 #include <bitset>
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -27,7 +26,7 @@ void apply_bitmask_of_ones(std::string* addr, std::string& mask) {
 }
 
 void get_addrs_to_update(std::string addr, std::string& mask, int start_index, 
-                        std::set<std::string>* addr_list) {
+                        std::vector<std::string>* addr_list) {
   bool floats_present = false;
   for (int i = start_index; i < 36; ++i) {
     if (mask.at(i) == 'X') {
@@ -36,14 +35,15 @@ void get_addrs_to_update(std::string addr, std::string& mask, int start_index,
       get_addrs_to_update(addr, mask, i + 1, addr_list);
       addr.at(i) = '1';
       get_addrs_to_update(addr, mask, i + 1, addr_list);
+      return;
     }
   }
   if (!floats_present) {
-    addr_list->insert(addr);
+    addr_list->push_back(addr);
   }
 }
 
-void update_addrs(std::set<std::string>& addr_list, unsigned long value,
+void update_addrs(std::vector<std::string>& addr_list, unsigned long value,
                   std::map<unsigned long long, unsigned long long>* mem) {
   for (auto const& addr : addr_list) {
     mem->insert_or_assign(std::bitset<36>(addr).to_ullong(), value);
@@ -60,7 +60,7 @@ int main() {
   std::map<unsigned long long, unsigned long long> memory_p2;
   std::string mask = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
   std::string what_do;
-  std::set<std::string> addr_list;
+  std::vector<std::string> addr_list;
   for (auto const& instr : instructions) {
     what_do = instr.substr(0, 4);
     if (what_do == "mask") {
