@@ -95,7 +95,7 @@ int main() {
     } else {
       for (int i = 0; i < field_count - 1; ++i) {
         if (!seen[i]) {  // don't look for fields we've already found
-          int key_pos = line.find(keys[i]);
+          auto key_pos = line.find(keys[i]);
           if (key_pos != std::string::npos) {
             seen[i] = true;
             int substr_begin = key_pos + 4;

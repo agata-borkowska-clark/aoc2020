@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iterator>
-#include <numeric>
+#include <limits>
 #include <sstream>
 #include <vector>
 
@@ -52,7 +52,7 @@ int main() {
  // int next_departure[bus_ids.size()];
   // Part 1
   int earliest_departure = std::numeric_limits<int>::max();
-  int earliest_bus_id;
+  int earliest_bus_id = bus_ids[0];
   for (size_t i = 0; i < bus_ids.size(); ++i) {
     if (bus_ids[i] == 0) {
       continue;

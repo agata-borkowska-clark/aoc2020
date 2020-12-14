@@ -88,7 +88,7 @@ int main() {
 
   // Part 2
   size_t stop = 0;
-  for (size_t i = pointer_backtrace.size() - 1; i >= 0; --i) {
+  for (size_t i = pointer_backtrace.size() - 1; true; --i) {
     if (instructions[pointer_backtrace[i]].substr(0, 3) != "acc") {
       stop = pointer_backtrace[i];
       break;
@@ -99,7 +99,7 @@ int main() {
     std::string instruction = instructions[pointer];
     pointer_backtrace.push_back(pointer);
     already_done[pointer] = true;
-    for (size_t i = pointer_backtrace.size() - 2; i >= 0; --i) {
+    for (size_t i = pointer_backtrace.size() - 2; true; --i) {
       if (instructions[pointer_backtrace[i]].substr(0, 3) != "acc") {
         if (pointer_backtrace[i] == stop) std::abort();
         stop = pointer_backtrace[i];

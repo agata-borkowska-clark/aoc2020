@@ -12,7 +12,7 @@ int main() {
   }
   int x_diffs[] = {1, 3, 5, 7, 1};
   size_t x[] = {0, 0, 0, 0, 0};
-  int y = 0;
+  unsigned int y = 0;
   size_t map_width = map[y].length();
   while (y < map.size()) {
     for (int i = 0; i < 4; ++i) {
