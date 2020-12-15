@@ -1,7 +1,8 @@
+#include <array>
 #include <cassert>
 #include <iostream>
 #include <limits>
-#include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -18,11 +19,12 @@ int main() {
   }
 
   // seen_number[i] is the timestamp when i was last seen
-  std::map<long, long long> seen_numbers;
+  std::unique_ptr<std::array<long, 30000000>> seen_numbers(new std::array<long, 30000000>);
   // populate starting numbers
+  seen_numbers->fill(-1);
   assert(starting_numbers.size() > 0);
   for (size_t t = 0; t < starting_numbers.size(); ++t) {
-    seen_numbers[starting_numbers[t]] = t;
+    (*seen_numbers)[starting_numbers[t]] = t;
   }
   // extrapolate up to 2020th number
   long last_number = starting_numbers.back();
@@ -30,13 +32,13 @@ int main() {
     if (t == 2020) {
       std::cout << last_number << '\n';
     }
-    if (seen_numbers.find(last_number) == seen_numbers.end()) {
+    if ((*seen_numbers)[last_number] == -1) {
       // number not seen before
-      seen_numbers[last_number] = t - 1;
+      (*seen_numbers)[last_number] = t - 1;
       last_number = 0;
     } else {
-      int number_to_say = t - 1 - seen_numbers[last_number];
-      seen_numbers[last_number] = t - 1;
+      int number_to_say = t - 1 - (*seen_numbers)[last_number];
+      (*seen_numbers)[last_number] = t - 1;
       last_number = number_to_say;
     }
   }
