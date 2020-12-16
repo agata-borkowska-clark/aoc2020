@@ -33,6 +33,7 @@ bool check_in_range(int val, const std::vector<std::pair<int, int>>& ranges) {
   for (auto const& range : ranges) {
     if (val >= range.first && val <= range.second) return true;
   }
+  std::cout << val << " not in range\n";
   return false;
 }
 
@@ -67,6 +68,7 @@ void eliminate(std::vector<std::set<std::string>>* fields_to_names,
         std::cout << "set size " << s.size() << '\n';
       }
       // for each field in this set, check that the values on all valid tickets are in range
+      std::vector<std::string> keys_to_delete;
       for (auto& key : s) {
         // Ranges for this key
         std::vector<std::pair<int, int>> ranges = fields_to_ranges[key];
@@ -79,10 +81,14 @@ void eliminate(std::vector<std::set<std::string>>* fields_to_names,
           }
           if (!all_good) {
             // the value in ith field are invalid for key
-            s.erase(key);
+            keys_to_delete.push_back(key);
             break;
           }
         }
+      }
+      for (auto& key : keys_to_delete) {
+        std::string k = key;
+        s.erase(k);
       }
     }
   }
