@@ -20,9 +20,9 @@ void ints_string_to_vector(std::string& str, std::vector<int>* v) {
 }
 
 /* Returns the number of sets with 1 element */
-unsigned int check_eliminated(const std::vector<std::set<std::string>>* fields_to_names) {
+unsigned int check_eliminated(const std::vector<std::set<std::string>>& fields_to_names) {
   unsigned int count = 0;
-  for (auto const& s : *fields_to_names) {
+  for (auto const& s : fields_to_names) {
     if (s.size() == 1)  ++count;
   }
   return count;
@@ -40,27 +40,26 @@ bool check_in_range(int val, const std::vector<std::pair<int, int>>& ranges) {
 void eliminate(std::vector<std::set<std::string>>* fields_to_names,
                const std::map<std::string, std::vector<std::pair<int, int>>>& fields_to_ranges, 
                const std::vector<std::vector<int>>& tickets) {
-  unsigned int check = check_eliminated(fields_to_names);
+  unsigned int check = check_eliminated(*fields_to_names);
   while(check != fields_to_names->size()) {
     // if we have a set containing 1 item, then remove that item from all other sets
     if (check > 0) {
-        for (size_t i = 0; i < fields_to_names->size(); ++i) {
-          if ((*fields_to_names)[i].size() == 1) {
-            std::string key = *((*fields_to_names)[i].begin());
-            for (size_t j = 0; j < fields_to_names->size(); ++j) {
-              if (j != i && (*fields_to_names)[j].find(key) != (*fields_to_names)[i].end()) {
-                (*fields_to_names)[j].erase(key);
-              }
+      for (size_t i = 0; i < fields_to_names->size(); ++i) {
+        if ((*fields_to_names)[i].size() == 1) {
+          const std::string& key = *((*fields_to_names)[i].begin());
+          for (size_t j = 0; j < fields_to_names->size(); ++j) {
+            if (j != i) {
+              (*fields_to_names)[j].erase(key);
             }
           }
         }
+      }
     }
     // for fields without matched keys, try to eliminate some of the keys
     for (size_t i = 0; i < fields_to_names->size(); ++i) {
       auto& s = (*fields_to_names)[i];
       if (s.size() == 1) {
         continue;
-      } else {
       }
       // for each field in this set, check that the values on all valid tickets are in range
       std::vector<std::string> keys_to_delete;
@@ -85,8 +84,7 @@ void eliminate(std::vector<std::set<std::string>>* fields_to_names,
         s.erase(key);
       }
     }
-
-  check = check_eliminated(fields_to_names);
+    check = check_eliminated(*fields_to_names);
   }
 }
 
