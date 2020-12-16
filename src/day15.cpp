@@ -19,7 +19,7 @@ int main() {
   }
 
   // seen_number[i] is the timestamp when i was last seen
-  std::unique_ptr<std::array<long, 30000000>> seen_numbers(new std::array<long, 30000000>);
+  std::unique_ptr<std::array<int, 30000000>> seen_numbers(new std::array<int, 30000000>);
   // populate starting numbers
   seen_numbers->fill(-1);
   assert(starting_numbers.size() > 0);
@@ -27,7 +27,7 @@ int main() {
     (*seen_numbers)[starting_numbers[t]] = t;
   }
   // extrapolate up to 2020th number
-  long last_number = starting_numbers.back();
+  int last_number = starting_numbers.back();
   for (size_t t = starting_numbers.size(); t < 30000000; ++t) {
     if (t == 2020) {
       std::cout << last_number << '\n';
