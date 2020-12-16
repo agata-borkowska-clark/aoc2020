@@ -20,62 +20,57 @@ void ints_string_to_vector(std::string& str, std::vector<int>* v) {
 }
 
 /* Returns the number of sets with 1 element */
-unsigned int check_eliminated(std::vector<std::set<std::string>>* fields_to_names) {
+unsigned int check_eliminated(const std::vector<std::set<std::string>>* fields_to_names) {
   unsigned int count = 0;
   for (auto const& s : *fields_to_names) {
     if (s.size() == 1)  ++count;
   }
-  std::cout << count << " definite fields counted\n";
   return count;
 }
 
 bool check_in_range(int val, const std::vector<std::pair<int, int>>& ranges) {
   for (auto const& range : ranges) {
-    if (val >= range.first && val <= range.second) return true;
+    if (val >= range.first && val <= range.second) {
+      return true;
+    }
   }
-  std::cout << val << " not in range\n";
   return false;
 }
 
 void eliminate(std::vector<std::set<std::string>>* fields_to_names,
-               std::map<std::string, std::vector<std::pair<int, int>>>& fields_to_ranges, 
+               const std::map<std::string, std::vector<std::pair<int, int>>>& fields_to_ranges, 
                const std::vector<std::vector<int>>& tickets) {
   unsigned int check = check_eliminated(fields_to_names);
   while(check != fields_to_names->size()) {
     // if we have a set containing 1 item, then remove that item from all other sets
     if (check > 0) {
-      bool something_changed = true;
-      while (something_changed) {
-        something_changed = false;
         for (size_t i = 0; i < fields_to_names->size(); ++i) {
           if ((*fields_to_names)[i].size() == 1) {
             std::string key = *((*fields_to_names)[i].begin());
             for (size_t j = 0; j < fields_to_names->size(); ++j) {
               if (j != i && (*fields_to_names)[j].find(key) != (*fields_to_names)[i].end()) {
                 (*fields_to_names)[j].erase(key);
-                something_changed = true;
               }
             }
           }
         }
-      }
     }
     // for fields without matched keys, try to eliminate some of the keys
-    for (auto& s : *fields_to_names) {
+    for (size_t i = 0; i < fields_to_names->size(); ++i) {
+      auto& s = (*fields_to_names)[i];
       if (s.size() == 1) {
         continue;
       } else {
-        std::cout << "set size " << s.size() << '\n';
       }
       // for each field in this set, check that the values on all valid tickets are in range
       std::vector<std::string> keys_to_delete;
-      for (auto& key : s) {
+      for (auto const& key : s) {
         // Ranges for this key
-        std::vector<std::pair<int, int>> ranges = fields_to_ranges[key];
+        std::vector<std::pair<int, int>> ranges = fields_to_ranges.at(key);
         // Checking if ith element in each ticket is valid for this key. If not, remove it.
-        for (size_t i = 0; i < tickets[i].size(); ++i) {
+        for (size_t j = 0; j < tickets.size(); ++j) {
           bool all_good = true;
-          for (auto& t : tickets) {
+          for (auto const& t : tickets) {
             all_good = check_in_range(t[i], ranges);
             if (!all_good) break;
           }
@@ -86,11 +81,12 @@ void eliminate(std::vector<std::set<std::string>>* fields_to_names,
           }
         }
       }
-      for (auto& key : keys_to_delete) {
-        std::string k = key;
-        s.erase(k);
+      for (auto const& key : keys_to_delete) {
+        s.erase(key);
       }
     }
+
+  check = check_eliminated(fields_to_names);
   }
 }
 
@@ -147,20 +143,19 @@ int main() {
   }
   std::cout << sum << '\n';
 
+  fields_to_ranges.erase("");
   // Match values to fields by elimination.
   // First, assign all keys to all fields.
   std::vector<std::set<std::string>> fields_to_names;
   std::set<std::string> keys;
-  for (auto const& it : fields_to_ranges) {
-    keys.insert(it.first);
+  for (auto const& [key, value] : fields_to_ranges) {
+    keys.insert(key);
   }
   for (size_t i = 0; i < your_ticket.size(); ++i) {
-    std::set<std::string> k(keys);
-    fields_to_names.push_back(k); 
+    fields_to_names.push_back(keys); 
   }
-  fields_to_ranges.erase("");
   eliminate(&fields_to_names, fields_to_ranges, tickets);
-  int product = 1;
+  long product = 1;
   for (size_t i = 0; i < your_ticket.size(); ++i) {
     std::string key = *fields_to_names[i].begin();
     if (key.length() >= 9 && key.substr(0, 9) == "departure") {
@@ -169,3 +164,4 @@ int main() {
   } 
   std::cout << product << '\n';
 }
+
