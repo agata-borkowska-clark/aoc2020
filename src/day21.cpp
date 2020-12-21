@@ -29,10 +29,9 @@ int main() {
     ++i;
     // add it to the allergens<->ingredient lists map
     while (i != std::sregex_iterator()) {
-      std::cout << (*i).str() << '\n';
       std::string allergen = (*i).str();
       if (allergens_to_ingredients.find(allergen) != allergens_to_ingredients.end()) {
-        allergens_to_ingredients[allergen].push_back(std::move(ingredients));
+        allergens_to_ingredients[allergen].push_back(ingredients);
       } else {
         std::vector<std::vector<std::string>> tmp;
         tmp.push_back(ingredients);
@@ -43,27 +42,17 @@ int main() {
   }
   // find the intersection of all ingredients list for each allergen
   for (const auto& [allergen, ingredients] : allergens_to_ingredients) {
-    std::cout << "considering allergen " << allergen << " with " << ingredients.size() << " ingredients lists\n";
     if (ingredients.size() == 1) {
       allergens_to_ingredients_reduced.emplace(allergen, ingredients[0]);
       continue;
     }
     std::vector<std::string> tmp = ingredients[0];
-      std::cout << "1st list has";
-      for (const auto& str : tmp) std::cout << " " << str;
-      std::cout << '\n';
     for (size_t i = 1; i < ingredients.size(); ++i) {
-      std::cout << "list has";
-      for (const auto& str : ingredients[i]) std::cout << " " << str;
-      std::cout << '\n';
       std::vector<std::string> result(tmp.size() + ingredients[i].size());
       std::vector<std::string>::iterator it;
       it = std::set_intersection(tmp.begin(), tmp.end(), ingredients[i].begin(), ingredients[i].end(), result.begin());
       result.resize(it - result.begin());
       tmp = result;
-      std::cout << "intersection has";
-      for (const auto& str : tmp) std::cout << " " << str;
-      std::cout << '\n';
     }
     allergens_to_ingredients_reduced.emplace(allergen, tmp);
   }
@@ -96,5 +85,9 @@ int main() {
   for (const auto& [ingredient, number] : all_ingredients) {
     count += number;
   }
-    std::cout << count << '\n';
+  std::cout << count << '\n';
+  for (const auto& [key, value] : allergens_to_ingredients_reduced) {
+    std::cout << value[0] << ',';  
+  }
+  std::cout << '\n';
 }
