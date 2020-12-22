@@ -23,7 +23,7 @@ template <bool part1>
 player play_the_game(std::deque<unsigned int>& player_1, std::deque<unsigned int>& player_2) {
   if (player_1.size() == 0) return PLAYER2;
   if (player_2.size() == 0) return PLAYER1;
-  if (!part1) {
+  if constexpr (!part1) {
     if (check_seen_previously(player_1, player_2)) return PLAYER1;
     seen_before.back().first.insert(player_1);
     seen_before.back().second.insert(player_2);
@@ -32,7 +32,7 @@ player play_the_game(std::deque<unsigned int>& player_1, std::deque<unsigned int
   player_1. pop_front();
   unsigned int p2 = player_2.front();
   player_2.pop_front();
-  if (!part1) {
+  if constexpr (!part1) {
     if (p1 <= player_1.size() && p2 <= player_2.size()) {
       seen_before.push_back({});
       std::deque<unsigned int> recursive_p1(player_1.begin(), player_1.begin() + p1);
