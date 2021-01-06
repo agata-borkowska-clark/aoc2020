@@ -47,71 +47,36 @@ void parse_rule(std::string& line) {
   cfg.emplace(id, r);
 }
 
-/* Checks if the beginning of the str matches the given rule and updates start to point at the end of match */
-bool confirm_match(int rule_id, size_t& start, const std::string& str, int next_rule = 0) {
-  if (rule_id == 8 || rule_id == 11) {
-    std::cout << "looping rule " << rule_id << " with " << cfg[rule_id].subrules.size() << " subrules\n";
-   // keep applying 42 until it no longer matches
-    size_t i = start;
-    int count = 0;
-    bool match = true;
-    do {
-      match = confirm_match(42, i, str);
-      if (match) ++count;
-    } while (i < str.length() && match);
-    std::cout << "matched 42 " << count << " times\n";
-    if (i >= str.length()) {
-      if (rule_id == 8) return match;
-      std::cout << "i exceeded str length\n";
-      return false;
+/* Returns the vector of all the possible ends of the match for a given rule */
+std::vector<size_t> apply_rule(int rule_id, size_t& start, const std::string& str) {
+  std::vector<size_t> ends = {};
+  // reached end of string, can't try and parse further.
+  if (start > str.size()) return ends;
+  rule& r = cfg[rule_id];
+  // this is a terminal rule
+  if (r.subrules.size() == 0) {
+    if (str[start] == r.terminal) {
+      ends.push_back(start + 1);
     }
-    if (!match) return false;
-    if (rule_id == 8) {
-      std::cout << "updating start to " << i << '\n';
-      start = i;
-    } else {
-      // check that we have an appropriate number of 31s
-      while (count >= 0 && i < str.length() && match) {
-        match = confirm_match(31, i, str);
+    return ends;
+  } 
+    
+  std::vector<size_t> tmp_starts = {}, tmp_ends = {}, tmp = {};
+  for (const auto& sr : r.subrules) {
+    tmp_starts = {};
+    tmp_starts.push_back(start);
+    for (const auto& subrule_id : sr) {
+      for (auto& i : tmp_starts) {
+        tmp = apply_rule(subrule_id, i, str);
+        tmp_ends.insert(tmp_ends.begin(), tmp.begin(), tmp.end());
       }
-      if (!match) {
-        return false;
-      }
-      if (count == 0 && match) {
-        start = i;
-      }
+      tmp_starts = tmp_ends;
+      tmp_ends = {};
+      tmp = {};
     }
-    return match;
+    ends.insert(ends.end(), tmp_starts.begin(), tmp_starts.end());
   }
-  if (cfg[rule_id].subrules.size() == 0) {
-    if (str[start] == cfg[rule_id].terminal) {
-      ++start;
-      return true;
-    } else { 
-      return false;
-    }
-  } else {
-    rule& r = cfg[rule_id];
-    for (const auto& v : r.subrules) {
-      size_t i = start;
-      bool sequence_match = true;
-      for (size_t sr = 0; sr < v.size(); ++sr) {
-        if (v[sr] == 8 && sr < v.size() - 1 && cfg[8].subrules.size() == 2) {
-          sequence_match &= confirm_match(v[sr], i, str, v[sr + 1]);
-        } else {
-          sequence_match &= confirm_match(v[sr], i, str);
-        }
-        if (!sequence_match){
-          break;
-        }
-      }
-      if (sequence_match) {
-        start = i;
-        return true;
-      }
-    }
-  }
-  return false;
+  return ends;
 }
 
 int main() {
@@ -127,7 +92,10 @@ int main() {
   }
   for (const auto& msg : input) {
     size_t i = 0;
-    if (confirm_match(0, i, msg) && i == msg.length()) ++count;
+    std::vector<size_t> rule_matches = apply_rule(0, i, msg);
+    if (std::find(rule_matches.begin(), rule_matches.end(), msg.size()) != rule_matches.end()) {
+      ++count;
+    }
   }
   std::cout << count << '\n';
   std::vector<int> subrule1;
@@ -143,11 +111,12 @@ int main() {
   rule& r2 = cfg[11];
   r2.subrules.push_back(std::move(subrule2));
   count = 0;
-  std::cout << "PART 2\n";
   for (const auto& msg : input) {
-    std::cout << "parsing " << msg << '\n';
     size_t i = 0;
-    if (confirm_match(0, i, msg) && i == msg.length()) ++count;
+    std::vector<size_t> rule_matches = apply_rule(0, i, msg);
+    if (std::find(rule_matches.begin(), rule_matches.end(), msg.size()) != rule_matches.end()) {
+      ++count;
+    }
   }
   std::cout << count << '\n';
 }
