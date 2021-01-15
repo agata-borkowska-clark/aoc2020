@@ -11,7 +11,6 @@ int main() {
   int id;
   while (std::getline(std::cin, line)) {
     id = std::stoi(line.substr(5));
-    std::cout << "parsing tile " << id << '\n';
     std::vector<std::string> tile = {};
     while (std::getline(std::cin, line) && line.length() > 0) {
       tile.push_back(line);
@@ -21,15 +20,16 @@ int main() {
       // top edge
       std::string top_edge = tile.front();
       edges_to_ids[top_edge].push_back(id);
-      std::cout << "top edge " << top_edge << '\n';
+      std::reverse(top_edge.begin(), top_edge.end());
+      edges_to_ids[top_edge].push_back(id);
     }
 
     {
       // bottom edge
       std::string bottom_edge = tile.back();
+      edges_to_ids[bottom_edge].push_back(id);
       std::reverse(bottom_edge.begin(), bottom_edge.end());
       edges_to_ids[bottom_edge].push_back(id);
-      std::cout << "bottom edge " << bottom_edge << '\n';
     }
 
     {
@@ -39,9 +39,9 @@ int main() {
         edge_arr[i] = tile[i][0];
       }
       std::string left_edge(edge_arr, 10);
+      edges_to_ids[left_edge].push_back(id);
       std::reverse(left_edge.begin(), left_edge.end());
       edges_to_ids[left_edge].push_back(id);
-      std::cout << "left edge " << left_edge << '\n';
     }
 
     {
@@ -53,25 +53,22 @@ int main() {
       }
       std::string right_edge(edge_arr, 10);
       edges_to_ids[right_edge].push_back(id);
-      std::cout << "right edge " << right_edge << '\n';
+      std::reverse(right_edge.begin(), right_edge.end());
+      edges_to_ids[right_edge].push_back(id);
     }
   }
-  std::set<int> tiles_with_unmatched_edges;
+  std::map<int, int> tiles_with_unmatched_edges;
   unsigned long long mult = 1;
   for (const auto& [edge, tiles] : edges_to_ids) {
     if (tiles.size() == 1) {
       int tile = tiles.front();
-      std::cout << "considering edge tile " << tile << '\n';
-      if (tiles_with_unmatched_edges.find(tile) != tiles_with_unmatched_edges.end()) {
+      if (tiles_with_unmatched_edges[tile] == 3) {
         mult *= tile;
-        std::cout << "corner tile\n";
       } else {
-        std::cout << "adding to set\n"; 
-        tiles_with_unmatched_edges.insert(tile);
+        tiles_with_unmatched_edges[tile]++;
       }
     }
   }
   std::cout << mult << '\n';
-  
-
 }
+
